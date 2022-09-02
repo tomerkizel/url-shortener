@@ -14,7 +14,6 @@ def redirects(request, generated_redirect):
         o = UrlRedirect.objects.get(generated_redirect=generated_redirect)
         # increment and save count
         o.increment()
-        print(o.counter)
         UrlRedirect.save(o, update_fields=['counter'])
         return redirect(o.original_url)
 
@@ -39,20 +38,7 @@ def create(request):
             response['content'] = "Bad Request - body must contain url"
             print("here")
             return response
-        
-        # try:
-        #     result = urlparse(body['url'])
-        #     if not all([result.scheme, result.netloc]):
-        #         response = HttpResponse(status=400)
-        #         response['content'] = "Bad Request - wrong url format"
-        #         print("or here")
-        #         return response
-        # except:
-        #     response = HttpResponse(status=400)
-        #     response['content'] = "Bad Request - wrong url format"
-        #     print("or there")
-        #     return response
-        # generate the new url end point
+    
         letters = string.ascii_letters
         all = letters.join(string.digits)
         # find a unique end point
@@ -68,7 +54,7 @@ def create(request):
         # add the new UrlRedirect object
         return HttpResponse("http://localhost:8000/s/%s" % res_str)
     # if GET - send Method Not Allowed
-    if request.method == "GET":
+    if request.method == "GET" or request.method == "PUT" or request.method == "DELETE":
         response = HttpResponse(status=405)
         response['content'] = "Method Not Allowed - must be POST"
         return response
