@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect
 from .models import UrlRedirect
-from urllib.parse import urlparse
+from django.db.models import F
 import json
 import string
 import random
@@ -13,8 +13,9 @@ def redirects(request, generated_redirect):
         # find the UrlRedirect object that holds generated_redirect
         o = UrlRedirect.objects.get(generated_redirect=generated_redirect)
         # increment and save count
-        o.increment()
-        UrlRedirect.save(o, update_fields=['counter'])
+    
+        o.count = F("count") + 1
+        o.save(update_fields=["count"])
         return redirect(o.original_url)
 
     except UrlRedirect.DoesNotExist:
